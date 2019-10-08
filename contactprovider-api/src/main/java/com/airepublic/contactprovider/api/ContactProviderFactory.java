@@ -19,15 +19,16 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
+import java.util.logging.Logger;
 
 import javax.annotation.PostConstruct;
+import javax.inject.Inject;
 import javax.inject.Singleton;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import com.airepublic.configuration.api.ConfigurationServiceException;
 import com.airepublic.configuration.api.IConfigurationService;
+import com.airepublic.logging.java.LogLevel;
+import com.airepublic.logging.java.LoggerConfig;
 
 /**
  * Factory producing {@link IContactProvider}s for the different {@link ContactType}s.
@@ -37,10 +38,11 @@ import com.airepublic.configuration.api.IConfigurationService;
 @Singleton
 public class ContactProviderFactory {
     private final static String CONFIG_PREFIX = "ContactProvider_";
-    private final static Logger LOG = LoggerFactory.getLogger(ContactProviderFactory.class);
+    @Inject
+    @LoggerConfig(level = LogLevel.INFO)
+    private Logger logger;
     private final Map<String, IContactProvider> contactServices = new HashMap<>();
     private IConfigurationService configurationService;
-
 
     /**
      * Initialized the configured {@link IContactProvider}s.
@@ -76,9 +78,9 @@ public class ContactProviderFactory {
             }
             return provider;
         } catch (final ConfigurationServiceException e) {
-            LOG.warn("Contact provider configuration could not be found for (" + CONFIG_PREFIX + type.name() + ") : ContactType=" + type + ", Locale=" + locale);
+            logger.warning("Contact provider configuration could not be found for (" + CONFIG_PREFIX + type.name() + ") : ContactType=" + type + ", Locale=" + locale);
         } catch (ClassNotFoundException | IllegalAccessException | InstantiationException | InvocationTargetException | NoSuchMethodException e) {
-            LOG.warn("Class in Contact provider configuration could not be found (" + classname + ") : ContactType=" + type + ", Locale=" + locale);
+            logger.warning("Class in Contact provider configuration could not be found (" + classname + ") : ContactType=" + type + ", Locale=" + locale);
         }
 
         return null;

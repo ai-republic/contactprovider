@@ -15,5 +15,5 @@ module contactprovider.email {
 
     requires transitive configuration.api;
     requires contactprovider.api;
-    requires cdi.api;
+    requires jakarta.enterprise.cdi.api;
 }
